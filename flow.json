@@ -1,0 +1,1149 @@
+[
+    {
+        "id": "5da13b0604777abc",
+        "type": "tab",
+        "label": "Orisec2MQTT",
+        "disabled": false,
+        "info": "",
+        "env": [
+            {
+                "name": "login_payload",
+                "value": "",
+                "type": "str"
+            },
+            {
+                "name": "getSerial_payload",
+                "value": "",
+                "type": "str"
+            },
+            {
+                "name": "getZones1_payload",
+                "value": "",
+                "type": "str"
+            },
+            {
+                "name": "getZones2_payload",
+                "value": "",
+                "type": "str"
+            },
+            {
+                "name": "getZoneConfig_payload",
+                "value": "",
+                "type": "str"
+            },
+            {
+                "name": "getZoneState_payload",
+                "value": "",
+                "type": "str"
+            },
+            {
+                "name": "orisec_ip",
+                "value": "192.168.0.xxx",
+                "type": "str"
+            },
+            {
+                "name": "orisec_port",
+                "value": "20202",
+                "type": "str"
+            },
+            {
+                "name": "getSupportInfo_payload",
+                "value": "",
+                "type": "str"
+            }
+        ]
+    },
+    {
+        "id": "4aab97eb282cb78a",
+        "type": "udp out",
+        "z": "5da13b0604777abc",
+        "name": "",
+        "addr": "",
+        "iface": "",
+        "port": "",
+        "ipv": "udp4",
+        "outport": "49988",
+        "base64": false,
+        "multicast": "false",
+        "x": 1130,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "7048d22e8ac25ede",
+        "type": "udp in",
+        "z": "5da13b0604777abc",
+        "name": "",
+        "iface": "",
+        "port": "49988",
+        "ipv": "udp4",
+        "multicast": "false",
+        "group": "",
+        "datatype": "buffer",
+        "x": 180,
+        "y": 800,
+        "wires": [
+            [
+                "2deb0dd241da6f12",
+                "db398457498d61ae"
+            ]
+        ]
+    },
+    {
+        "id": "208e126558cb0558",
+        "type": "inject",
+        "z": "5da13b0604777abc",
+        "name": "Start",
+        "props": [
+            {
+                "p": "ip",
+                "v": "orisec_ip",
+                "vt": "env"
+            },
+            {
+                "p": "port",
+                "v": "orisec_port",
+                "vt": "env"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 130,
+        "y": 140,
+        "wires": [
+            [
+                "b4a90dfcccb9d978"
+            ]
+        ]
+    },
+    {
+        "id": "e789184a20393dc3",
+        "type": "function",
+        "z": "5da13b0604777abc",
+        "name": "",
+        "func": "msg.oldPayload = msg.payload; //save it for later debugging\nvar noSpaces = msg.payload.replace(/ /g, '');// remove spaces\nmsg.payload = Buffer.from(noSpaces, \"hex\"); //convert to buffer\n\nmsg.ip = msg.ip;\nmsg.port = msg.port;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 960,
+        "y": 340,
+        "wires": [
+            [
+                "4aab97eb282cb78a",
+                "07ba0503016a7b38"
+            ]
+        ]
+    },
+    {
+        "id": "0c99cb14a6f1f8ea",
+        "type": "debug",
+        "z": "5da13b0604777abc",
+        "name": "OUTBOUND",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1150,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "f77cd6d4adf75f41",
+        "type": "split",
+        "z": "5da13b0604777abc",
+        "name": "",
+        "splt": "[0]",
+        "spltType": "bin",
+        "arraySplt": "100",
+        "arraySpltType": "len",
+        "stream": false,
+        "addname": "",
+        "x": 910,
+        "y": 880,
+        "wires": [
+            [
+                "2aafc61fb5a150f2"
+            ]
+        ]
+    },
+    {
+        "id": "b69bfdb5dfbf28fd",
+        "type": "function",
+        "z": "5da13b0604777abc",
+        "name": "GetZoneStates",
+        "func": "//Reset Sensor Counter\n//flow.set('sensor',undefined);\n\n//fetch zoneStates array from buffer\nvar b = msg.payload;\n\nmsg.payload = b.slice(10,32);\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 720,
+        "y": 1000,
+        "wires": [
+            [
+                "7319b56b3dc23e19"
+            ]
+        ]
+    },
+    {
+        "id": "f6e18728cc1c2311",
+        "type": "function",
+        "z": "5da13b0604777abc",
+        "name": "",
+        "func": "//Reset Zone Counter\nflow.set('zone',undefined);\n\n//Reset Zone Array\nflow.set('arr',undefined);\n\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 740,
+        "y": 340,
+        "wires": [
+            [
+                "e789184a20393dc3"
+            ]
+        ]
+    },
+    {
+        "id": "6ede93e0af1d24c7",
+        "type": "split",
+        "z": "5da13b0604777abc",
+        "name": "",
+        "splt": "2",
+        "spltType": "len",
+        "arraySplt": "2",
+        "arraySpltType": "len",
+        "stream": false,
+        "addname": "",
+        "x": 910,
+        "y": 940,
+        "wires": [
+            [
+                "085be7c90f1b8db3"
+            ]
+        ]
+    },
+    {
+        "id": "085be7c90f1b8db3",
+        "type": "function",
+        "z": "5da13b0604777abc",
+        "name": "",
+        "func": "var count=flow.get('sensor')||0;\ncount +=1;\nflow.set('sensor',count);\n\n//offset -1, to get 0 array position\ncount = count-1;\nvar inactive = new Buffer([0,0]);\nvar state = \"...\";\nvar result = inactive.compare(msg.payload);\n\n\nvar obj = flow.get(\"arr[\"+count+\"]\");\nvar unique_id = flow.get(\"arr[\"+count+\"].unique_id\");\n\nflow.set(\"arr[\"+count+\"].state\",state);\n//flow.set(\"arr[\"+count+\"].raw\",msg.payload);\n\nvar topic = 'homeassistant/binary_sensor/OrisecZone' + unique_id;\n\nflow.set(\"arr[\"+count+\"].state_topic\",topic);\n\n\n\n//  \"name\": \"FrontDoorTest\",\n//  \"device_class\": \"motion\",\n//  \"state_topic\": \"homeassistant/binary_sensor/1/state\"\nconfig = {}\n\nconfig.name = obj.name;\nconfig.unique_id = 'OrisecZone' + unique_id;\nconfig.device_class = 'motion';\nconfig.state_topic = topic + '/state';\n\n//device map for mqtt discovery\nconfig.device = flow.get('deviceMap')\n\nmsg.payload = config;\nmsg.topic = topic + '/config';\nmsg.mqttpayload = state;\n\nreturn msg;\n\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1080,
+        "y": 940,
+        "wires": [
+            [
+                "188a28cafa928f94",
+                "3de3889ea870ab91"
+            ]
+        ]
+    },
+    {
+        "id": "b8a09709706ee3ec",
+        "type": "debug",
+        "z": "5da13b0604777abc",
+        "name": "STATE",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1270,
+        "y": 1060,
+        "wires": []
+    },
+    {
+        "id": "7319b56b3dc23e19",
+        "type": "split",
+        "z": "5da13b0604777abc",
+        "name": "",
+        "splt": "2",
+        "spltType": "len",
+        "arraySplt": "2",
+        "arraySpltType": "len",
+        "stream": false,
+        "addname": "",
+        "x": 910,
+        "y": 1000,
+        "wires": [
+            [
+                "def49e105b9fabe6",
+                "b8a09709706ee3ec"
+            ]
+        ]
+    },
+    {
+        "id": "def49e105b9fabe6",
+        "type": "function",
+        "z": "5da13b0604777abc",
+        "name": "",
+        "func": "var count=flow.get('sensor')||0;\ncount +=1;\nflow.set('sensor',count);\n\n//offset -1, to get 0 array position\ncount = count-1;\n\nvar clearState =  new Buffer([0]);\n//var clearState = new Buffer([0,0]);\n  var state = \"...\";\n\nif(Buffer.compare(msg.payload.slice(0,1),clearState) === 0) {\n  state = \"OFF\";\n} else {\n  state = \"ON\"\n}\n\n//var obj = flow.get(\"arr[\"+count+\"]\");\nvar unique_id = flow.get(\"arr[\"+count+\"].unique_id\");\n\n//flow.set(\"arr[\"+count+\"].state\",state);\n//flow.set(\"arr[\"+count+\"].raw\",msg.payload);\n//flow.set(\"arr[\"+count+\"].state_topic\",topicState);\n\nvar topic = 'homeassistant/binary_sensor/OrisecZone' + unique_id;\n\nmsg.payload = state;\nmsg.topic = topic + '/state';\n\nreturn msg;\n\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1080,
+        "y": 1000,
+        "wires": [
+            [
+                "188a28cafa928f94",
+                "b8a09709706ee3ec"
+            ]
+        ]
+    },
+    {
+        "id": "188a28cafa928f94",
+        "type": "mqtt out",
+        "z": "5da13b0604777abc",
+        "name": "",
+        "topic": "",
+        "qos": "1",
+        "retain": "true",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "c162f505.1920e8",
+        "x": 1270,
+        "y": 1000,
+        "wires": []
+    },
+    {
+        "id": "cf1f44acb92f1129",
+        "type": "mqtt in",
+        "z": "5da13b0604777abc",
+        "d": true,
+        "name": "",
+        "topic": "#",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "c162f505.1920e8",
+        "nl": false,
+        "rap": false,
+        "inputs": 0,
+        "x": 190,
+        "y": 900,
+        "wires": [
+            [
+                "db398457498d61ae"
+            ]
+        ]
+    },
+    {
+        "id": "986077107cc532f5",
+        "type": "function",
+        "z": "5da13b0604777abc",
+        "name": "GetZoneList",
+        "func": "//fetch zone array from buffer\nvar b = msg.payload;\n\nmsg.payload = b.slice(10,b.length-2); //last 2 chars are checksum\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 710,
+        "y": 880,
+        "wires": [
+            [
+                "f77cd6d4adf75f41"
+            ]
+        ]
+    },
+    {
+        "id": "2aafc61fb5a150f2",
+        "type": "function",
+        "z": "5da13b0604777abc",
+        "name": "",
+        "func": "//Skip Null Zones\nvar zoneName = msg.payload.toString();\nif (zoneName != \"\") {\n\nvar count=flow.get('zone')||0;\ncount +=1;\nflow.set('zone',count);\n\nvar arr = flow.get('arr') || [];\n//arr.push(msg.payload);\nflow.set(\"arr\", arr);\n\n\n    obj = {}\n    obj.unique_id = count//i\n    obj.name = zoneName\n    obj.state = '...'    \n    //obj.raw = msg.payload        \n    arr.push(obj)\n\nmsg.payload = obj\nreturn msg\n}\n\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1080,
+        "y": 880,
+        "wires": [
+            [
+                "8b95537964de399f"
+            ]
+        ]
+    },
+    {
+        "id": "8b95537964de399f",
+        "type": "debug",
+        "z": "5da13b0604777abc",
+        "name": "ZONES",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1280,
+        "y": 880,
+        "wires": []
+    },
+    {
+        "id": "10fd2a5fe4d00af7",
+        "type": "function",
+        "z": "5da13b0604777abc",
+        "name": "GetZoneConfig",
+        "func": "//Reset Sensor Counter\n//flow.set('sensor',undefined);\n\n//fetch zoneStates array from buffer\nvar b = msg.payload;\n\nmsg.payload = b.slice(10,32);\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 720,
+        "y": 940,
+        "wires": [
+            [
+                "6ede93e0af1d24c7"
+            ]
+        ]
+    },
+    {
+        "id": "3de3889ea870ab91",
+        "type": "debug",
+        "z": "5da13b0604777abc",
+        "name": "CONFIG",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1280,
+        "y": 940,
+        "wires": []
+    },
+    {
+        "id": "2deb0dd241da6f12",
+        "type": "function",
+        "z": "5da13b0604777abc",
+        "name": "MessageType",
+        "func": "var b = msg.payload.slice(2,3);\nmsg.payload;\n\nvar zonesmsg = new Buffer([96]);\nvar configmsg = new Buffer([176]);\nvar statemsg = new Buffer([126]);\nvar serialmsg = new Buffer([2]);\nvar supportmsg = new Buffer([182]);\nvar errormsg = new Buffer([99]);\n\nif (Buffer.compare(b,zonesmsg) === 0) {\n//match configmsg\n   return [ msg,null,null, null,null,null,null ];\n}    \nelse if (Buffer.compare(b,configmsg) === 0) {\n//match configmsg\n   return [ null,msg, null,null,null,null,null ];\n} \nelse if (Buffer.compare(b,statemsg) === 0) {\n//match configmsg\n   return [ null,null,msg,null, null,null,null ];\n}\nelse if (Buffer.compare(b,serialmsg) === 0) {\n//match configmsg\n   return [ null,null,null,msg, null,null ];\n}\nelse if (Buffer.compare(b,supportmsg) === 0) {\n//match configmsg\n   return [ null,null,null,null,msg, null,null ];\n}\nelse if (Buffer.compare(b,errormsg) === 0) {\n//match errormsg\n   return [ null,null,null, null,null,msg,null ];\n}\nelse {\n//no match\n   return [ null,null,null, null,null,null,msg ];\n}",
+        "outputs": 7,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 440,
+        "y": 800,
+        "wires": [
+            [
+                "986077107cc532f5"
+            ],
+            [
+                "10fd2a5fe4d00af7"
+            ],
+            [
+                "b69bfdb5dfbf28fd"
+            ],
+            [
+                "9a8fa1182f3c8962"
+            ],
+            [
+                "27ee063cde5f2933"
+            ],
+            [
+                "b4a90dfcccb9d978"
+            ],
+            [
+                "db398457498d61ae"
+            ]
+        ]
+    },
+    {
+        "id": "db398457498d61ae",
+        "type": "debug",
+        "z": "5da13b0604777abc",
+        "name": "DEBUG",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 700,
+        "y": 1100,
+        "wires": []
+    },
+    {
+        "id": "9a8fa1182f3c8962",
+        "type": "function",
+        "z": "5da13b0604777abc",
+        "name": "GetSerial",
+        "func": "//Reset SerialNo\nflow.set('serialNo',undefined);\n//fetch zoneStates array from buffer\nvar b = msg.payload;\n\nmsg.payload = b.slice(52,68);\n\nflow.set('serialNo',msg.payload.toString());\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 700,
+        "y": 720,
+        "wires": [
+            [
+                "ef2416fc9cdd0cd8"
+            ]
+        ]
+    },
+    {
+        "id": "beda5244af3269fe",
+        "type": "trigger",
+        "z": "5da13b0604777abc",
+        "name": "",
+        "op1": "",
+        "op2": "",
+        "op1type": "pay",
+        "op2type": "payl",
+        "duration": "4",
+        "extend": false,
+        "overrideDelay": false,
+        "units": "s",
+        "reset": "",
+        "bytopic": "all",
+        "topic": "topic",
+        "outputs": 2,
+        "x": 540,
+        "y": 140,
+        "wires": [
+            [
+                "e789184a20393dc3"
+            ],
+            [
+                "e836df271d789d22"
+            ]
+        ]
+    },
+    {
+        "id": "e836df271d789d22",
+        "type": "change",
+        "z": "5da13b0604777abc",
+        "name": "GetSerial",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "getSerial_payload",
+                "tot": "env"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 200,
+        "y": 220,
+        "wires": [
+            [
+                "2344066221bf9216"
+            ]
+        ]
+    },
+    {
+        "id": "2344066221bf9216",
+        "type": "trigger",
+        "z": "5da13b0604777abc",
+        "name": "",
+        "op1": "",
+        "op2": "",
+        "op1type": "pay",
+        "op2type": "payl",
+        "duration": "1",
+        "extend": false,
+        "overrideDelay": false,
+        "units": "s",
+        "reset": "",
+        "bytopic": "all",
+        "topic": "topic",
+        "outputs": 2,
+        "x": 540,
+        "y": 220,
+        "wires": [
+            [
+                "e789184a20393dc3"
+            ],
+            [
+                "241d7d59315e9335"
+            ]
+        ]
+    },
+    {
+        "id": "fdb6e1135c93bf58",
+        "type": "trigger",
+        "z": "5da13b0604777abc",
+        "name": "",
+        "op1": "",
+        "op2": "",
+        "op1type": "pay",
+        "op2type": "payl",
+        "duration": "4",
+        "extend": false,
+        "overrideDelay": false,
+        "units": "s",
+        "reset": "",
+        "bytopic": "all",
+        "topic": "topic",
+        "outputs": 2,
+        "x": 540,
+        "y": 340,
+        "wires": [
+            [
+                "f6e18728cc1c2311"
+            ],
+            [
+                "5e6e7b5d121a1db3"
+            ]
+        ]
+    },
+    {
+        "id": "4ac53b44f7f8ca09",
+        "type": "change",
+        "z": "5da13b0604777abc",
+        "name": "GetZones1-10",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "getZones1_payload",
+                "tot": "env"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 220,
+        "y": 340,
+        "wires": [
+            [
+                "fdb6e1135c93bf58"
+            ]
+        ]
+    },
+    {
+        "id": "5e6e7b5d121a1db3",
+        "type": "change",
+        "z": "5da13b0604777abc",
+        "name": "GetZones11-20",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "getZones2_payload",
+                "tot": "env"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 220,
+        "y": 400,
+        "wires": [
+            [
+                "2298418815cc2ee3"
+            ]
+        ]
+    },
+    {
+        "id": "2298418815cc2ee3",
+        "type": "trigger",
+        "z": "5da13b0604777abc",
+        "name": "",
+        "op1": "",
+        "op2": "",
+        "op1type": "pay",
+        "op2type": "payl",
+        "duration": "4",
+        "extend": false,
+        "overrideDelay": false,
+        "units": "s",
+        "reset": "",
+        "bytopic": "all",
+        "topic": "topic",
+        "outputs": 2,
+        "x": 540,
+        "y": 400,
+        "wires": [
+            [
+                "e789184a20393dc3"
+            ],
+            [
+                "89672e0a1ca202a0"
+            ]
+        ]
+    },
+    {
+        "id": "89672e0a1ca202a0",
+        "type": "change",
+        "z": "5da13b0604777abc",
+        "name": "Get Zones (Config)",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "getZoneConfig_payload",
+                "tot": "env"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 230,
+        "y": 460,
+        "wires": [
+            [
+                "255a76ee1aeb1b04"
+            ]
+        ]
+    },
+    {
+        "id": "255a76ee1aeb1b04",
+        "type": "trigger",
+        "z": "5da13b0604777abc",
+        "name": "",
+        "op1": "",
+        "op2": "",
+        "op1type": "pay",
+        "op2type": "payl",
+        "duration": "4",
+        "extend": false,
+        "overrideDelay": false,
+        "units": "s",
+        "reset": "",
+        "bytopic": "all",
+        "topic": "topic",
+        "outputs": 2,
+        "x": 540,
+        "y": 460,
+        "wires": [
+            [
+                "1142f8dedc0c0745"
+            ],
+            [
+                "b594b19f69eabab4"
+            ]
+        ]
+    },
+    {
+        "id": "b594b19f69eabab4",
+        "type": "change",
+        "z": "5da13b0604777abc",
+        "name": "Get ZoneState (Repeat)",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "getZoneState_payload",
+                "tot": "env"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 250,
+        "y": 520,
+        "wires": [
+            [
+                "adcdd9a1e48bd15f"
+            ]
+        ]
+    },
+    {
+        "id": "adcdd9a1e48bd15f",
+        "type": "trigger",
+        "z": "5da13b0604777abc",
+        "name": "",
+        "op1": "",
+        "op2": "",
+        "op1type": "pay",
+        "op2type": "payl",
+        "duration": "4",
+        "extend": false,
+        "overrideDelay": false,
+        "units": "s",
+        "reset": "",
+        "bytopic": "all",
+        "topic": "topic",
+        "outputs": 2,
+        "x": 540,
+        "y": 560,
+        "wires": [
+            [
+                "1142f8dedc0c0745"
+            ],
+            [
+                "b594b19f69eabab4"
+            ]
+        ]
+    },
+    {
+        "id": "1142f8dedc0c0745",
+        "type": "function",
+        "z": "5da13b0604777abc",
+        "name": "",
+        "func": "//Reset Sensor Counter\nflow.set('sensor',undefined);\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 780,
+        "y": 480,
+        "wires": [
+            [
+                "e789184a20393dc3"
+            ]
+        ]
+    },
+    {
+        "id": "b4a90dfcccb9d978",
+        "type": "change",
+        "z": "5da13b0604777abc",
+        "name": "Send PIN",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "login_payload",
+                "tot": "env"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 340,
+        "y": 140,
+        "wires": [
+            [
+                "beda5244af3269fe"
+            ]
+        ]
+    },
+    {
+        "id": "ef2416fc9cdd0cd8",
+        "type": "debug",
+        "z": "5da13b0604777abc",
+        "name": "SERIAL",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 900,
+        "y": 720,
+        "wires": []
+    },
+    {
+        "id": "241d7d59315e9335",
+        "type": "change",
+        "z": "5da13b0604777abc",
+        "name": "GetSupportInfo",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "getSupportInfo_payload",
+                "tot": "env"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 220,
+        "y": 280,
+        "wires": [
+            [
+                "13fbca93b458305a"
+            ]
+        ]
+    },
+    {
+        "id": "13fbca93b458305a",
+        "type": "trigger",
+        "z": "5da13b0604777abc",
+        "name": "",
+        "op1": "",
+        "op2": "",
+        "op1type": "pay",
+        "op2type": "payl",
+        "duration": "1",
+        "extend": false,
+        "overrideDelay": false,
+        "units": "s",
+        "reset": "",
+        "bytopic": "all",
+        "topic": "topic",
+        "outputs": 2,
+        "x": 540,
+        "y": 280,
+        "wires": [
+            [
+                "e789184a20393dc3"
+            ],
+            [
+                "4ac53b44f7f8ca09"
+            ]
+        ]
+    },
+    {
+        "id": "f548a4fdc30b7f9a",
+        "type": "debug",
+        "z": "5da13b0604777abc",
+        "name": "PANEL",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1280,
+        "y": 720,
+        "wires": []
+    },
+    {
+        "id": "9ffd11d4a689f4e1",
+        "type": "comment",
+        "z": "5da13b0604777abc",
+        "name": "UDP request to Alarm",
+        "info": "",
+        "x": 180,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "be90edab2ccaeae9",
+        "type": "comment",
+        "z": "5da13b0604777abc",
+        "name": "Parse response from Alarm, send MQTT out",
+        "info": "",
+        "x": 270,
+        "y": 640,
+        "wires": []
+    },
+    {
+        "id": "27ee063cde5f2933",
+        "type": "split",
+        "z": "5da13b0604777abc",
+        "name": "",
+        "splt": "[0]",
+        "spltType": "bin",
+        "arraySplt": "100",
+        "arraySpltType": "len",
+        "stream": false,
+        "addname": "",
+        "x": 690,
+        "y": 780,
+        "wires": [
+            [
+                "55165c9c40700687"
+            ]
+        ]
+    },
+    {
+        "id": "55165c9c40700687",
+        "type": "switch",
+        "z": "5da13b0604777abc",
+        "name": "GetModel",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "index",
+                "v": "12",
+                "vt": "num",
+                "v2": "12",
+                "v2t": "num"
+            },
+            {
+                "t": "index",
+                "v": "9",
+                "vt": "num",
+                "v2": "9",
+                "v2t": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 900,
+        "y": 780,
+        "wires": [
+            [
+                "b67df2989af2beb4"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "b67df2989af2beb4",
+        "type": "function",
+        "z": "5da13b0604777abc",
+        "name": "",
+        "func": "//Reset ModelNo\nflow.set('modelNo',undefined);\n//fetch ModelNo from message\nmsg.payload = msg.payload.toString();\n//Set ModelNo flow variable\nflow.set('modelNo',msg.payload);\n\n//device map for mqtt discovery\ndevice = {}\ndevice.manufacturer = \"Orisec\";\ndevice.name = \"Alarm System\";\n//device.identifiers = env.get(\"orisec_ip\");\ndevice.identifiers = flow.get('serialNo')\ndevice.model = flow.get('modelNo')\n\n//Set ModelNo flow variable\nflow.set('deviceMap',device);\n\n\n//build mqtt message for panel\nvar obj;\nvar topic = 'homeassistant/alarm_control_panel/Orisec';\n\nconfig = {}\n\nconfig.name = \"Alarm Panel\";\nconfig.unique_id = flow.get('modelNo')\n//config.device_class = 'motion';\nconfig.state_topic = topic + '';\nconfig.command_topic = topic + '/set';\n\nconfig.device = flow.get('deviceMap')\n\nmsg.payload = config;\nmsg.topic = topic + '/config';\nmsg.mqttpayload = 'pending';\n\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1080,
+        "y": 720,
+        "wires": [
+            [
+                "f548a4fdc30b7f9a",
+                "188a28cafa928f94",
+                "db46dd2c45ca02a5"
+            ]
+        ]
+    },
+    {
+        "id": "b2b784a8ee56c363",
+        "type": "comment",
+        "z": "5da13b0604777abc",
+        "name": "Any unknown messages, print to DEBUG",
+        "info": "",
+        "x": 800,
+        "y": 1060,
+        "wires": []
+    },
+    {
+        "id": "83a5be9c775ac907",
+        "type": "comment",
+        "z": "5da13b0604777abc",
+        "name": "Zone/Sensors",
+        "info": "",
+        "x": 710,
+        "y": 820,
+        "wires": []
+    },
+    {
+        "id": "fabe6e846b5022f5",
+        "type": "comment",
+        "z": "5da13b0604777abc",
+        "name": "Panel/Device",
+        "info": "",
+        "x": 710,
+        "y": 680,
+        "wires": []
+    },
+    {
+        "id": "db46dd2c45ca02a5",
+        "type": "function",
+        "z": "5da13b0604777abc",
+        "name": "",
+        "func": "//build mqtt state message for panel\nvar obj;\nvar topic = 'homeassistant/alarm_control_panel/Orisec';\n\nmsg.topic = topic;\nmsg.payload = 'pending';\n\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1080,
+        "y": 780,
+        "wires": [
+            [
+                "188a28cafa928f94",
+                "f548a4fdc30b7f9a"
+            ]
+        ]
+    },
+    {
+        "id": "92d003fd49d71a5f",
+        "type": "comment",
+        "z": "5da13b0604777abc",
+        "name": "Readme",
+        "info": "",
+        "x": 120,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "07ba0503016a7b38",
+        "type": "udp out",
+        "z": "5da13b0604777abc",
+        "name": "",
+        "addr": "$orisec_ip",
+        "iface": "",
+        "port": "$orisec_port",
+        "ipv": "udp4",
+        "outport": "",
+        "base64": false,
+        "multicast": "false",
+        "x": 1250,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "c162f505.1920e8",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "192.168.0.xxx",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "compatmode": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    }
+]
