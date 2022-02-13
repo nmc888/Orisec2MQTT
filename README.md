@@ -1,3 +1,4 @@
+# Orisec2MQTT
 My first Node-RED flow, which has been running reliably for a few months. The primary purpose of this flow was to provide real-time zone state updates (PIR movement detected; door open) from an [Orisec](https://www.orisec.co.uk/) alarm panel to Home Assistant via [MQTT discovery](https://www.home-assistant.io/docs/mqtt/discovery/). Orisec alarm panels are becoming increasingly popular in the UK, and the inspiration for this flow was to mimic the functionality of the popular [Texecom2MQTT](https://github.com/dchesterton/texecom2mqtt-hassio) integration for Home Assistant by emulating the Orisec Android app.
 
 **Note** - I have not attempted to establish *how* the Android app constructs the UDP payload requests to the alarm panel. Instead I am simply sending the same UDP payloads via Node-RED and interpreting the response messages (see Config below).
