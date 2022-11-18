@@ -25,7 +25,7 @@ The following requests occur in sequence:
 - Fetch Zone Config (MQTT [binary sensor](https://www.home-assistant.io/docs/mqtt/discovery/#motion-detection-binary-sensor))
 - Fetch Zones States (ON/OFF - repeat every 4 secs)
 
-Each request has a unique payload which is defined as an environment variable against the flow (for ease of admin). These can be obtained by analysing the UDP packets sent between from a device running the Android app to the Alarm panel and are sent as a hex string.
+Each request has a unique payload which is defined as an environment variable against the flow (for ease of admin). These can be obtained by analysing the UDP packets sent (as a hex string) between a device running the Android app and the Alarm panel.
 
 ## Zones explained
 Zones names are fetched in batches of 10. My alarm system contains 13 zones (combination of PIRs, PAs, Door/window sensors), therefore I am sending two requests (i) Zones 1-10, (ii) Zones 11-20, and adding these to a zone array. In theory this could be extended for 20+ zones but I have no way to test this. A single request is subsequently made to fetch states for *all* zones.
